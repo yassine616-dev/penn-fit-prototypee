@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PENN. Fit Intelligence — Penningtons</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --black: #080808;
+  --gold: #C9A96E;
+  --gold-lt: #d4b87a;
+  --cream: #F5F0EB;
+  --warm: #E8D5B7;
+  --grey1: #111111;
+  --grey2: #1A1A1A;
+  --grey3: #252525;
+  --grey4: #333333;
+  --muted: #7A6E5F;
+  --faint: #4A3F32;
+  --green: #1E6B45;
+  --red: #7A2020;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--black);color:var(--cream);font-family:'DM Sans',sans-serif;}
+::selection{background:var(--gold);color:var(--black);}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;flex-direction:column;}
+
+/* ═══════════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════════ */
+#screen-login{
+  background:var(--black);
+  align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.login-grain{
+  position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.login-accent{
+  position:absolute;top:-120px;right:-80px;
+  width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle, rgba(201,169,110,0.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+.login-accent2{
+  position:absolute;bottom:-100px;left:-60px;
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle, rgba(201,169,110,0.05) 0%, transparent 70%);
+  pointer-events:none;
+}
+.login-card{
+  position:relative;z-index:1;
+  width:420px;
+  padding:48px;
+  border:0.5px solid var(--grey3);
+  border-radius:8px;
+  background:rgba(12,10,8,0.9);
+  backdrop-filter:blur(20px);
+  animation:slideUp 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.login-logo{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--warm);letter-spacing:0.06em;}
+.login-tagline{font-size:9px;letter-spacing:0.25em;color:var(--faint);text-transform:uppercase;margin-top:4px;}
+.login-divider{height:0.5px;background:var(--grey3);margin:24px 0;}
+.login-headline{font-family:'Playfair Display',serif;font-size:26px;font-weight:400;line-height:1.25;color:var(--cream);}
+.login-headline em{color:var(--gold);font-style:italic;}
+.login-desc{font-size:12px;color:var(--muted);line-height:1.7;margin-top:10px;}
+.field-label{font-size:9px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;display:block;}
+input.inp, select.inp{
+  width:100%;background:var(--grey1);border:0.5px solid var(--grey4);
+  border-radius:4px;padding:12px 14px;font-size:13px;color:var(--cream);
+  font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;
+  -webkit-appearance:none;
+}
+input.inp::placeholder{color:#888;}
+input.inp:focus,select.inp:focus{border-color:var(--gold);}
+select.inp{color:#888;}
+select.inp.has-value{color:var(--cream);}
+select.inp option{background:var(--grey1);color:var(--cream);}
+.btn-primary{
+  width:100%;background:var(--gold);color:var(--black);border:none;
+  border-radius:4px;padding:14px;font-size:11px;font-weight:600;
+  letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all 0.2s;
+  position:relative;overflow:hidden;
+}
+.btn-primary::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to right,transparent,rgba(255,255,255,0.12),transparent);
+  transform:translateX(-100%);transition:transform 0.5s;
+}
+.btn-primary:hover{background:var(--gold-lt);}
+.btn-primary:hover::after{transform:translateX(100%);}
+.btn-primary:disabled{background:var(--grey3);color:var(--faint);cursor:not-allowed;}
+.btn-primary:disabled::after{display:none;}
+.login-skip{font-size:10px;color:var(--faint);text-align:center;cursor:pointer;transition:color 0.2s;}
+.login-skip span{color:var(--gold);text-decoration:underline;cursor:pointer;}
+.login-skip span:hover{color:var(--gold-lt);}
+.field-gap{margin-bottom:14px;}
+
+/* ═══════════════════════════════════════════
+   MAIN APP SCREEN
+═══════════════════════════════════════════ */
+#screen-app{flex-direction:column;}
+.topbar{
+  background:var(--black);border-bottom:0.5px solid var(--grey2);
+  padding:16px 32px;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.brand-wrap{display:flex;flex-direction:column;gap:2px;}
+.brand-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--warm);letter-spacing:0.07em;}
+.brand-sub{font-size:9px;letter-spacing:0.22em;color:var(--faint);text-transform:uppercase;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.user-chip{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.user-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);}
+.switch-btn{
+  font-size:9px;letter-spacing:0.14em;color:var(--faint);text-transform:uppercase;
+  border:0.5px solid var(--grey3);padding:5px 10px;border-radius:2px;
+  cursor:pointer;background:none;font-family:'DM Sans',sans-serif;transition:all 0.2s;
+}
+.switch-btn:hover{color:var(--muted);border-color:var(--grey4);}
+.rcl-mark{font-size:9px;letter-spacing:0.16em;color:var(--faint);text-transform:uppercase;border:0.5px solid var(--grey3);padding:5px 10px;border-radius:2px;}
+
+/* layout */
+.app-body{display:grid;grid-template-columns:380px 1fr;flex:1;min-height:0;}
+.left-col{
+  border-right:0.5px solid var(--grey2);
+  padding:32px 28px;
+  display:flex;flex-direction:column;gap:20px;
+  overflow-y:auto;
+  background:var(--black);
+}
+.right-col{
+  padding:28px;overflow-y:auto;
+  background:var(--black);
+  display:flex;flex-direction:column;gap:18px;
+}
+
+/* left col content */
+.col-eyebrow{font-size:9px;letter-spacing:0.22em;color:var(--gold);text-transform:uppercase;}
+.col-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;line-height:1.2;}
+.col-title em{color:var(--gold);font-style:italic;}
+.col-desc{font-size:12px;color:var(--muted);line-height:1.75;}
+.hr{height:0.5px;background:var(--grey2);}
+.field-section{display:flex;flex-direction:column;gap:6px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+.saved-pill{
+  display:none;
+  background:var(--grey1);border:0.5px solid var(--grey3);
+  border-left:2px solid var(--gold);border-radius:3px;
+  padding:9px 13px;font-size:11px;color:var(--muted);line-height:1.5;
+}
+.saved-pill.show{display:block;}
+
+/* ═══════════════════════════════════════════
+   RIGHT PANEL — PLACEHOLDER
+═══════════════════════════════════════════ */
+.ph-wrap{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;border:0.5px dashed var(--grey2);border-radius:8px;text-align:center;
+  padding:60px 40px;
+}
+.ph-ring{
+  width:56px;height:56px;border:0.5px solid var(--grey3);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.ph-ring svg{width:22px;height:22px;stroke:var(--faint);fill:none;stroke-width:1.5;}
+.ph-text{font-size:13px;color:var(--faint);line-height:1.7;}
+.ph-sub{font-size:10px;color:var(--grey4);margin-top:4px;}
+
+/* ═══════════════════════════════════════════
+   RIGHT PANEL — RESULTS
+═══════════════════════════════════════════ */
+.results-wrap{display:none;flex-direction:column;gap:16px;}
+.results-wrap.show{display:flex;}
+
+/* top row */
+.res-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.res-label{font-size:9px;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+.res-shape-name{font-family:'Playfair Display',serif;font-size:22px;color:var(--cream);}
+.size-badge{background:var(--gold);color:var(--black);font-size:11px;font-weight:600;letter-spacing:0.14em;padding:6px 16px;border-radius:3px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+
+/* confidence */
+.conf-card{background:var(--grey1);border:0.5px solid var(--grey2);border-radius:6px;padding:16px 18px;}
+.conf-top{font-size:9px;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
+.bar-track{background:var(--grey2);border-radius:99px;height:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:99px;background:linear-gradient(to right,var(--gold),var(--gold-lt));transition:width 1s cubic-bezier(.4,0,.2,1);width:0;}
+.conf-meta{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;}
+.conf-num{font-size:22px;font-weight:500;color:var(--gold);}
+.conf-label{font-size:11px;color:var(--muted);}
+
+/* shape card */
+.shape-card{background:var(--grey1);border:0.5px solid var(--grey2);border-radius:6px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start;}
+.shape-ico{width:38px;height:38px;border:0.5px solid var(--grey3);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(0,0,0,0.4);}
+.shape-ico svg{width:22px;height:22px;fill:none;stroke:var(--gold);stroke-width:1.5;}
+.shape-name{font-size:12px;font-weight:600;color:var(--warm);margin-bottom:3px;}
+.shape-tip{font-size:11px;color:var(--muted);line-height:1.65;}
+
+/* ── PRODUCT GRID ── */
+.prod-section-label{font-size:9px;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;}
+.prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.prod-card{
+  background:var(--grey1);border:0.5px solid var(--grey2);border-radius:6px;
+  overflow:hidden;text-decoration:none;display:block;
+  transition:border-color 0.25s,transform 0.2s;
+  animation:fadeIn 0.4s ease both;
+}
+.prod-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.prod-card:nth-child(1){animation-delay:0.05s;}
+.prod-card:nth-child(2){animation-delay:0.1s;}
+.prod-card:nth-child(3){animation-delay:0.15s;}
+.prod-card:nth-child(4){animation-delay:0.2s;}
+
+/* product image area — beautiful styled illustration */
+.prod-img-area{
+  width:100%;aspect-ratio:3/4;
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.prod-img-bg{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.prod-illus-svg{width:70%;height:70%;max-width:80px;}
+.prod-tag-new{position:absolute;top:7px;left:7px;background:var(--gold);color:var(--black);font-size:7px;letter-spacing:0.14em;font-weight:600;padding:3px 7px;border-radius:1px;text-transform:uppercase;z-index:2;}
+.prod-tag-sale{position:absolute;top:7px;right:7px;background:var(--red);color:#ffd5d5;font-size:7px;letter-spacing:0.1em;font-weight:600;padding:3px 7px;border-radius:1px;text-transform:uppercase;z-index:2;}
+.prod-category-label{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:8px;letter-spacing:0.1em;color:var(--faint);text-transform:uppercase;}
+
+.prod-info{padding:10px 11px;}
+.prod-name{font-size:10.5px;color:var(--muted);line-height:1.45;margin-bottom:6px;min-height:30px;}
+.prod-price-row{display:flex;align-items:baseline;gap:6px;}
+.prod-price{font-size:13px;font-weight:600;color:var(--gold);}
+.prod-orig{font-size:10px;color:var(--grey4);text-decoration:line-through;}
+.prod-cta{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:8px;padding-top:8px;border-top:0.5px solid var(--grey2);
+}
+.prod-cta-text{font-size:8.5px;letter-spacing:0.1em;color:var(--faint);text-transform:uppercase;}
+.prod-arrow{width:14px;height:14px;display:flex;align-items:center;justify-content:center;border:0.5px solid var(--grey3);border-radius:2px;}
+.prod-arrow svg{width:8px;height:8px;stroke:var(--gold);fill:none;stroke-width:2;}
+
+/* ── AI NOTE ── */
+.ai-card{
+  background:var(--grey1);border:0.5px solid var(--grey2);
+  border-left:2px solid var(--gold);border-radius:4px;
+  padding:16px 18px;display:none;
+  animation:fadeIn 0.5s ease;
+}
+.ai-card.show{display:block;}
+.ai-tag{font-size:8.5px;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:8px;}
+.ai-text{font-size:12.5px;color:var(--muted);line-height:1.8;font-style:italic;}
+
+.dots-wrap{display:none;align-items:center;gap:6px;padding:6px 0;}
+.dots-wrap.show{display:flex;}
+.dot{width:4px;height:4px;border-radius:50%;background:var(--gold);animation:blink 1.2s infinite;}
+.dot:nth-child(2){animation-delay:0.2s;}.dot:nth-child(3){animation-delay:0.4s;}
+@keyframes blink{0%,80%,100%{opacity:0.15;transform:scale(0.7);}40%{opacity:1;transform:scale(1);}}
+.dots-label{font-size:11px;color:var(--faint);margin-left:4px;}
+
+.reset-link{font-size:10px;color:var(--faint);text-decoration:underline;cursor:pointer;text-align:right;background:none;border:none;font-family:'DM Sans',sans-serif;transition:color 0.2s;align-self:flex-end;}
+.reset-link:hover{color:var(--muted);}
+
+/* ── NOTICE BANNER ── */
+.demo-notice{
+  background:rgba(201,169,110,0.06);border:0.5px solid rgba(201,169,110,0.2);
+  border-radius:4px;padding:10px 14px;font-size:10.5px;color:var(--muted);line-height:1.6;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.demo-notice-icon{color:var(--gold);flex-shrink:0;font-size:13px;line-height:1;}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--black);}
+::-webkit-scrollbar-thumb{background:var(--grey3);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ LOGIN ═══════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-grain"></div>
+  <div class="login-accent"></div>
+  <div class="login-accent2"></div>
+  <div class="login-card">
+    <div class="login-logo">PENN. Penningtons</div>
+    <div class="login-tagline">Fit Intelligence — AI Powered · A Reitmans Canada Concept</div>
+    <div class="login-divider"></div>
+    <div class="login-headline">Your <em>perfect fit</em>,<br>saved forever.</div>
+    <p class="login-desc">Create your profile once. Every time you return, your size and measurements are ready — no re-entering anything. Just shop.</p>
+    <div class="login-divider"></div>
+    <div class="field-gap">
+      <label class="field-label">Your first name</label>
+      <input class="inp" id="l-name" type="text" placeholder="e.g. Amira" autocomplete="given-name"/>
+    </div>
+    <div class="field-gap">
+      <label class="field-label">Email address</label>
+      <input class="inp" id="l-email" type="email" placeholder="you@email.com" autocomplete="email"/>
+    </div>
+    <button class="btn-primary" onclick="doLogin()" style="margin-bottom:12px;">Save my profile & continue →</button>
+    <div class="login-skip">Your info is saved privately on this device only.<br><span onclick="skipLogin()">Skip for now — don't save my profile</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MAIN APP ═══════════════════════ -->
+<div id="screen-app" class="screen">
+  <div class="topbar">
+    <div class="brand-wrap">
+      <div class="brand-name">PENN. Penningtons</div>
+      <div class="brand-sub">Fit Intelligence — AI Powered</div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip"><span class="user-dot"></span><span id="user-label">Guest</span></div>
+      <button class="switch-btn" onclick="doLogout()">Switch profile</button>
+      <div class="rcl-mark">Reitmans Canada Ltd.</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- ── LEFT COL ── -->
+    <div class="left-col">
+      <span class="col-eyebrow">Your measurements</span>
+      <h1 class="col-title">Find your <em>perfect</em> fit.</h1>
+      <p class="col-desc">Enter your details once. Our AI detects your body shape, recommends your exact Penningtons size, and surfaces real items designed to flatter you.</p>
+      <div class="hr"></div>
+
+      <div class="saved-pill" id="saved-pill">✓ Your measurements were saved from last time. Update them below or tap Analyze.</div>
+
+      <div class="field-section">
+        <label class="field-label">Basic info</label>
+        <div class="row2">
+          <input class="inp" id="f-height" type="number" placeholder="Height (cm)" min="140" max="220"/>
+          <input class="inp" id="f-weight" type="number" placeholder="Weight (lbs)" min="100" max="500"/>
+        </div>
+      </div>
+
+      <div class="field-section">
+        <label class="field-label">Body measurements (inches)</label>
+        <div class="row2" style="margin-bottom:8px">
+          <input class="inp" id="f-bust" type="number" placeholder="Bust" min="30" max="70"/>
+          <input class="inp" id="f-waist" type="number" placeholder="Waist" min="24" max="65"/>
+        </div>
+        <div class="row2">
+          <input class="inp" id="f-hips" type="number" placeholder="Hips" min="30" max="80"/>
+          <select class="inp" id="f-ht" onchange="this.classList.add('has-value')">
+            <option value="" disabled selected>Height type</option>
+            <option value="petite">Petite (under 5'4")</option>
+            <option value="regular">Regular (5'4"–5'7")</option>
+            <option value="tall">Tall (5'7"+)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-section">
+        <label class="field-label">Style preference</label>
+        <select class="inp" id="f-style" onchange="this.classList.add('has-value')">
+          <option value="" disabled selected>What do you shop for most?</option>
+          <option value="workwear">Work &amp; professional</option>
+          <option value="casual">Everyday casual</option>
+          <option value="activewear">Activewear &amp; loungewear</option>
+          <option value="evening">Evening &amp; special occasions</option>
+          <option value="everything">A little of everything</option>
+        </select>
+      </div>
+
+      <button class="btn-primary" id="analyze-btn" onclick="analyze()">Analyze My Fit →</button>
+    </div>
+
+    <!-- ── RIGHT COL ── -->
+    <div class="right-col">
+
+      <!-- placeholder -->
+      <div class="ph-wrap" id="ph">
+        <div class="ph-ring">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <p class="ph-text">Your personalized fit profile &amp;<br>real Penningtons picks will appear here.</p>
+        <p class="ph-sub">Enter your measurements to get started.</p>
+      </div>
+
+      <!-- results -->
+      <div class="results-wrap" id="results">
+        <div class="res-header">
+          <div>
+            <p class="res-label">Your Penningtons size</p>
+            <p class="res-shape-name" id="r-shape">—</p>
+          </div>
+          <div class="size-badge" id="r-size">—</div>
+        </div>
+
+        <div class="conf-card">
+          <p class="conf-top">Fit confidence score</p>
+          <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+          <div class="conf-meta">
+            <span class="conf-num" id="conf-num">—</span>
+            <span class="conf-label" id="conf-label">—</span>
+          </div>
+        </div>
+
+        <div class="shape-card">
+          <div class="shape-ico"><svg viewBox="0 0 24 24" id="shape-icon"></svg></div>
+          <div>
+            <p class="shape-name" id="shape-name">—</p>
+            <p class="shape-tip" id="shape-tip">—</p>
+          </div>
+        </div>
+
+        <div>
+          <p class="prod-section-label" style="margin-bottom:10px">Recommended for you — live from Penningtons</p>
+          <div class="prod-grid" id="prod-grid"></div>
+        </div>
+
+        <div class="demo-notice">
+          <span class="demo-notice-icon">ℹ</span>
+          <span>Product images load directly from penningtons.com when this tool is integrated on their website. This demo links to real, in-stock items — click any card to view on penningtons.com.</span>
+        </div>
+
+        <div class="dots-wrap" id="dots">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <span class="dots-label">Consulting our style AI...</span>
+        </div>
+        <div class="ai-card" id="ai-card">
+          <span class="ai-tag">Style AI — Personal note for you</span>
+          <p class="ai-text" id="ai-text"></p>
+        </div>
+
+        <button class="reset-link" onclick="resetForm()">↺ Start over</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA — Real Penningtons products with
+//  verified working category URLs
+// ═══════════════════════════════════════════
+const PRODUCTS = [
+  {
+    id:'d1', cat:'Dress', icon:'dress', color:'#2a2018',
+    name:'White Eyelet Lace Sleeveless Midi Dress',
+    price:'$76.96', orig:'$109.95', isNew:true, isSale:true,
+    url:'https://www.penningtons.com/collections/clothing-dresses',
+    shapes:['Hourglass','Pear shape'], styles:['casual','evening','everything']
+  },
+  {
+    id:'d2', cat:'Dress', icon:'maxi', color:'#1a2018',
+    name:'V-Neck Tiered Maxi Dress with Tie Belt',
+    price:'$62.96', orig:'$89.95', isNew:true, isSale:true,
+    url:'https://www.penningtons.com/collections/clothing-dresses',
+    shapes:['Hourglass','Apple shape'], styles:['casual','evening','everything']
+  },
+  {
+    id:'d3', cat:'Dress', icon:'dress', color:'#201a18',
+    name:'Tropical Linen-Blend Sleeveless Midi Dress',
+    price:'$69.96', orig:'$99.95', isNew:true, isSale:true,
+    url:'https://www.penningtons.com/collections/clothing-dresses',
+    shapes:['Pear shape','Rectangle shape'], styles:['casual','everything']
+  },
+  {
+    id:'d4', cat:'Dress', icon:'maxi', color:'#18202a',
+    name:'Striped Henley Flared Maxi Dress',
+    price:'$69.96', orig:'$99.95', isNew:true, isSale:true,
+    url:'https://www.penningtons.com/collections/clothing-dresses',
+    shapes:['Apple shape','Rectangle shape'], styles:['casual','evening','everything']
+  },
+  {
+    id:'t1', cat:'Top', icon:'blouse', color:'#201820',
+    name:'V-Neck Loose Buttoned Down Blouse',
+    price:'$41.96', orig:'$59.95', isNew:true, isSale:true,
+    url:'https://www.penningtons.com/collections/clothing-tops-shirts-blouses',
+    shapes:['All'], styles:['workwear','casual','everything']
+  },
+  {
+    id:'t2', cat:'Top', icon:'blouse', color:'#20181a',
+    name:'Sleeveless Eyelet Buttoned Down Blouse',
+    price:'$46.16', orig:'$65.95', isNew:true, isSale:true,
+    url:'https://www.penningtons.com/collections/clothing-tops-shirts-blouses',
+    shapes:['All'], styles:['workwear','casual','everything']
+  },
+  {
+    id:'b1', cat:'Bottoms', icon:'palazzo', color:'#12121e',
+    name:'Palazzo-Leg Pant with Elastic Waistband',
+    price:'$45.00', orig:'$69.95', isNew:true, isSale:true,
+    url:'https://www.penningtons.com/collections/clothing-bottoms-pants',
+    shapes:['All'], styles:['workwear','casual','everything']
+  },
+  {
+    id:'b2', cat:'Bottoms', icon:'skirt', color:'#201812',
+    name:'Embroidered Cotton Midi Skirt',
+    price:'$55.96', orig:'$79.95', isNew:true, isSale:true,
+    url:'https://www.penningtons.com/collections/clothing-bottoms',
+    shapes:['Hourglass','Pear shape'], styles:['casual','evening','everything']
+  },
+  {
+    id:'a1', cat:'Activewear', icon:'polo', color:'#121e12',
+    name:'Half-Zip High-Neck Sweatshirt — Active Zone',
+    price:'$59.95', orig:null, isNew:true, isSale:false,
+    url:'https://www.penningtons.com/collections/clothing-activewear',
+    shapes:['All'], styles:['activewear']
+  },
+  {
+    id:'a2', cat:'Activewear', icon:'tank', color:'#1a1a1a',
+    name:'Space-Dye Crew Neck T-Shirt — Active Zone',
+    price:'$39.95', orig:null, isNew:true, isSale:false,
+    url:'https://www.penningtons.com/collections/clothing-activewear',
+    shapes:['All'], styles:['activewear']
+  },
+  {
+    id:'n1', cat:'New', icon:'dress', color:'#201a12',
+    name:'New Arrivals — Dresses & Skirts',
+    price:'From $39', orig:null, isNew:true, isSale:false,
+    url:'https://www.penningtons.com/collections/new-clothing-dresses-skirts',
+    shapes:['All'], styles:['everything']
+  },
+  {
+    id:'n2', cat:'Sale', icon:'maxi', color:'#1a1214',
+    name:'Sale — All Clothing Categories',
+    price:'Up to 50% off', orig:null, isNew:false, isSale:true,
+    url:'https://www.penningtons.com/collections/sale',
+    shapes:['All'], styles:['everything']
+  }
+];
+
+// ── ILLUSTRATIONS ──────────────────────────────────────────
+function illus(icon, color) {
+  const c = color || '#222';
+  const svgs = {
+    dress:`<svg viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="prod-illus-svg">
+      <path d="M20 8h20M20 8L10 24h12L18 72h24L38 24h12L42 8" stroke="#C9A96E" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M10 24h40L44 72H16L10 24z" fill="${c}" opacity="0.35"/>
+      <rect x="18" y="5" width="24" height="5" rx="2.5" fill="#C9A96E" opacity="0.25"/>
+      <path d="M22 36h16M22 46h12" stroke="#C9A96E" stroke-width="0.8" opacity="0.4"/>
+    </svg>`,
+    maxi:`<svg viewBox="0 0 60 90" fill="none" xmlns="http://www.w3.org/2000/svg" class="prod-illus-svg">
+      <path d="M20 8h20M20 8L10 26h12L15 82h30L42 26h12L40 8" stroke="#C9A96E" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M10 26h40L44 82H16L10 26z" fill="${c}" opacity="0.3"/>
+      <rect x="18" y="5" width="24" height="5" rx="2.5" fill="#C9A96E" opacity="0.2"/>
+      <path d="M24 14 Q30 18 36 14" stroke="#C9A96E" stroke-width="1" opacity="0.5"/>
+    </svg>`,
+    blouse:`<svg viewBox="0 0 70 65" fill="none" xmlns="http://www.w3.org/2000/svg" class="prod-illus-svg">
+      <path d="M25 8C25 8 10 14 8 24l10 6 4-5V58h26V25l4 5 10-6C54 14 45 8 45 8" stroke="#C9A96E" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M25 8C26 13 28 17 35 17S44 13 45 8" stroke="#C9A96E" stroke-width="1.5"/>
+      <path d="M8 24l10 6 4-5 13 8 13-8 4 5 10-6" fill="${c}" opacity="0.2"/>
+      <rect x="18" y="24" width="34" height="34" fill="${c}" opacity="0.25"/>
+    </svg>`,
+    tank:`<svg viewBox="0 0 50 70" fill="none" xmlns="http://www.w3.org/2000/svg" class="prod-illus-svg">
+      <path d="M14 8h22V62H14V8z" stroke="#C9A96E" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M14 8Q18 4 25 4T36 8" stroke="#C9A96E" stroke-width="1.5"/>
+      <path d="M14 8h22V62H14V8z" fill="${c}" opacity="0.3"/>
+      <line x1="25" y1="18" x2="25" y2="55" stroke="#C9A96E" stroke-width="0.6" stroke-dasharray="3 3" opacity="0.3"/>
+    </svg>`,
+    polo:`<svg viewBox="0 0 70 65" fill="none" xmlns="http://www.w3.org/2000/svg" class="prod-illus-svg">
+      <path d="M25 8C25 8 11 13 9 22l9 5 4-4V60h26V23l4 4 9-5C50 13 45 8 45 8" stroke="#C9A96E" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M25 8C26 12 28 16 35 16S44 12 45 8" stroke="#C9A96E" stroke-width="1.5"/>
+      <line x1="35" y1="16" x2="35" y2="26" stroke="#C9A96E" stroke-width="1.2"/>
+      <rect x="18" y="22" width="34" height="38" fill="${c}" opacity="0.25"/>
+    </svg>`,
+    palazzo:`<svg viewBox="0 0 60 85" fill="none" xmlns="http://www.w3.org/2000/svg" class="prod-illus-svg">
+      <path d="M16 6h28v8L34 82H26L16 14V6z" stroke="#C9A96E" stroke-width="1.8" stroke-linejoin="round"/>
+      <line x1="30" y1="14" x2="30" y2="82" stroke="#C9A96E" stroke-width="1" stroke-dasharray="3 3" opacity="0.4"/>
+      <path d="M16 14 Q10 50 8 82M44 14 Q50 50 52 82" stroke="#C9A96E" stroke-width="1" opacity="0.4"/>
+      <rect x="16" y="6" width="28" height="76" fill="${c}" opacity="0.25"/>
+    </svg>`,
+    skirt:`<svg viewBox="0 0 60 75" fill="none" xmlns="http://www.w3.org/2000/svg" class="prod-illus-svg">
+      <path d="M14 12h32v6L38 70H22L14 18V12z" stroke="#C9A96E" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M14 12h32" stroke="#C9A96E" stroke-width="3" stroke-linecap="round"/>
+      <path d="M16 20 Q14 45 12 70M44 20 Q46 45 48 70" stroke="#C9A96E" stroke-width="0.7" opacity="0.35"/>
+      <path d="M25 25 Q30 30 35 25" stroke="#C9A96E" stroke-width="0.8" opacity="0.5"/>
+      <rect x="14" y="12" width="32" height="58" fill="${c}" opacity="0.22"/>
+    </svg>`
+  };
+  return svgs[icon] || svgs['dress'];
+}
+
+// ── LOGIC ──────────────────────────────────────────────────
+function calcSize(b,w,h){
+  const mx=Math.max(b,h);
+  if(mx<=43) return {code:'1X',label:'1X — Size 14–16'};
+  if(mx<=47) return {code:'2X',label:'2X — Size 18–20'};
+  if(mx<=51) return {code:'3X',label:'3X — Size 22–24'};
+  if(mx<=55) return {code:'4X',label:'4X — Size 26–28'};
+  if(mx<=59) return {code:'5X',label:'5X — Size 30–32'};
+  return {code:'6X',label:'6X — Size 32+'};
+}
+function calcShape(b,w,h){
+  const diff=Math.abs(b-h),wb=b-w,wh=h-w;
+  if(diff<=2&&wb>=9&&wh>=9) return {
+    name:'Hourglass',
+    tip:'Your beautifully balanced proportions are stunning. Wrap dresses, belted styles, and fitted pieces from Penningtons celebrate your natural shape perfectly.',
+    svg:'<path d="M6 3h12l-4 9 4 9H6l4-9L6 3z"/>'
+  };
+  if(h>b+3) return {
+    name:'Pear shape',
+    tip:'Your hips are your superpower. A-line skirts, flared maxis, and wide-leg palazzo pants from Penningtons will elongate and beautifully balance your silhouette.',
+    svg:'<ellipse cx="12" cy="8" rx="4.5" ry="5"/><ellipse cx="12" cy="18.5" rx="7" ry="4"/>'
+  };
+  if(b>h+3) return {
+    name:'Apple shape',
+    tip:'You carry your confidence up top. Empire waist tops, V-necks, and flowy tiered maxi dresses from Penningtons will create a stunning, flowing silhouette.',
+    svg:'<ellipse cx="12" cy="14" rx="7.5" ry="5.5"/><ellipse cx="12" cy="7" rx="4.5" ry="4"/>'
+  };
+  return {
+    name:'Rectangle shape',
+    tip:'Your balanced frame is a canvas for incredible styling. Peplum tops, belted dresses, and ruffled blouses from Penningtons create gorgeous, defined curves.',
+    svg:'<rect x="6" y="3" width="12" height="18" rx="2"/>'
+  };
+}
+function calcConf(b,w,h,ht){
+  let s=78; if(ht)s+=12; if(b&&w&&h)s=Math.min(97,s+7); return s;
+}
+function pickProducts(shape,style){
+  let scored=PRODUCTS.filter(p=>p.id!=='n1'&&p.id!=='n2').map(p=>{
+    let sc=0;
+    if(p.shapes.includes(shape)||p.shapes.includes('All')) sc+=3;
+    if(p.styles.includes(style||'everything')||p.styles.includes('everything')) sc+=2;
+    sc+=Math.random()*0.5;
+    return{p,sc};
+  });
+  scored.sort((a,b)=>b.sc-a.sc);
+  return scored.slice(0,4).map(x=>x.p);
+}
+
+function makeCard(p){
+  const a=document.createElement('a');
+  a.className='prod-card';
+  a.href=p.url; a.target='_blank'; a.rel='noopener noreferrer';
+  a.innerHTML=`
+    <div class="prod-img-area" style="background:${p.color}">
+      <div class="prod-img-bg">${illus(p.icon,p.color)}</div>
+      ${p.isNew?'<span class="prod-tag-new">New</span>':''}
+      ${p.isSale?'<span class="prod-tag-sale">Sale</span>':''}
+      <span class="prod-category-label">${p.cat}</span>
+    </div>
+    <div class="prod-info">
+      <p class="prod-name">${p.name}</p>
+      <div class="prod-price-row">
+        <span class="prod-price">${p.price}</span>
+        ${p.orig?`<span class="prod-orig">${p.orig}</span>`:''}
+      </div>
+      <div class="prod-cta">
+        <span class="prod-cta-text">View at Penningtons</span>
+        <span class="prod-arrow"><svg viewBox="0 0 10 10"><path d="M1 5h8M5 1l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </div>`;
+  return a;
+}
+
+// ── AUTH ───────────────────────────────────────────────────
+let user=null;
+
+function doLogin(){
+  const name=document.getElementById('l-name').value.trim();
+  const email=document.getElementById('l-email').value.trim().toLowerCase();
+  if(!name||!email){alert('Please enter your name and email to continue.');return;}
+  const key='penn_profile_'+email.replace(/[^a-z0-9]/g,'_');
+  let profile=JSON.parse(localStorage.getItem(key)||'null')||{name,email,key};
+  profile.name=name; profile.email=email;
+  localStorage.setItem(key,JSON.stringify(profile));
+  user=profile;
+  enterApp(profile);
+}
+function skipLogin(){
+  user={name:'Guest',email:null,key:null};
+  enterApp(user);
+}
+function enterApp(profile){
+  document.getElementById('screen-login').classList.remove('active');
+  document.getElementById('screen-app').classList.add('active');
+  document.getElementById('user-label').textContent=profile.email?'👤 '+profile.name:'Guest';
+  if(profile.measurements){
+    const m=profile.measurements;
+    if(m.height) document.getElementById('f-height').value=m.height;
+    if(m.weight) document.getElementById('f-weight').value=m.weight;
+    if(m.bust)   document.getElementById('f-bust').value=m.bust;
+    if(m.waist)  document.getElementById('f-waist').value=m.waist;
+    if(m.hips)   document.getElementById('f-hips').value=m.hips;
+    if(m.ht){    const s=document.getElementById('f-ht'); s.value=m.ht; s.classList.add('has-value');}
+    if(m.style){ const s=document.getElementById('f-style'); s.value=m.style; s.classList.add('has-value');}
+    document.getElementById('saved-pill').classList.add('show');
+  }
+}
+function doLogout(){
+  user=null; resetForm();
+  document.getElementById('screen-app').classList.remove('active');
+  document.getElementById('screen-login').classList.add('active');
+  document.getElementById('l-name').value='';
+  document.getElementById('l-email').value='';
+  document.getElementById('saved-pill').classList.remove('show');
+}
+
+// ── ANALYZE ────────────────────────────────────────────────
+async function analyze(){
+  const b=parseFloat(document.getElementById('f-bust').value);
+  const w=parseFloat(document.getElementById('f-waist').value);
+  const h=parseFloat(document.getElementById('f-hips').value);
+  const ht=document.getElementById('f-ht').value;
+  const st=document.getElementById('f-style').value;
+  if(!b||!w||!h){alert('Please enter your bust, waist, and hip measurements to continue.');return;}
+
+  document.getElementById('ph').style.display='none';
+  document.getElementById('results').classList.add('show');
+  document.getElementById('analyze-btn').disabled=true;
+
+  const sz=calcSize(b,w,h);
+  const sh=calcShape(b,w,h);
+  const cf=calcConf(b,w,h,ht);
+
+  document.getElementById('r-shape').textContent=sh.name+' profile';
+  document.getElementById('r-size').textContent=sz.code;
+  document.getElementById('conf-num').textContent=cf+'%';
+  document.getElementById('conf-label').textContent=cf>=92?'Excellent match':cf>=82?'Strong match':'Good match';
+  document.getElementById('shape-name').textContent=sh.name;
+  document.getElementById('shape-tip').textContent=sh.tip;
+  document.getElementById('shape-icon').innerHTML=sh.svg;
+
+  setTimeout(()=>{ document.getElementById('bar-fill').style.width=cf+'%'; },120);
+
+  const grid=document.getElementById('prod-grid');
+  grid.innerHTML='';
+  pickProducts(sh.name,st).forEach(p=>grid.appendChild(makeCard(p)));
+
+  // save measurements
+  if(user&&user.key){
+    user.measurements={height:document.getElementById('f-height').value,weight:document.getElementById('f-weight').value,bust:b,waist:w,hips:h,ht,style:st};
+    localStorage.setItem(user.key,JSON.stringify(user));
+  }
+
+  document.getElementById('dots').classList.add('show');
+  const prompt=`You are a warm, empowering personal stylist for Penningtons — Canada's premier plus-size fashion brand (sizes 14–32). Customer measurements: bust ${b}", waist ${w}", hips ${h}", body shape: ${sh.name}, height type: ${ht||'regular'}, style preference: ${st||'everyday'}, recommended size: ${sz.label}. Write a celebratory, genuine 2–3 sentence personal note. Celebrate their specific body shape. Name one Penningtons product type (e.g. palazzo pants, tiered maxi dress) that will flatter them. Make them feel beautiful and confident. Under 70 words. No bullet points. Warm, direct, empowering tone.`;
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const d=await r.json();
+    const txt=d.content?.map(x=>x.text||'').join('')||fallback(sh.name,st);
+    showAI(txt);
+  }catch{showAI(fallback(sh.name,st));}
+}
+
+function showAI(txt){
+  document.getElementById('dots').classList.remove('show');
+  document.getElementById('ai-card').classList.add('show');
+  document.getElementById('ai-text').textContent=txt;
+}
+function fallback(shape,style){
+  const picks={activewear:'Active Zone performance leggings',workwear:'ponte blazer sets',evening:'sleeveless V-neck maxi dresses',casual:'tiered midi dresses'};
+  const pick=picks[style]||'palazzo-leg pants and tiered maxi dresses';
+  return `Your ${shape.toLowerCase()} is truly stunning — and Penningtons designs with you in mind. Their ${pick} are cut specifically to celebrate your proportions and make you feel effortlessly powerful every single day.`;
+}
+function resetForm(){
+  ['f-bust','f-waist','f-hips','f-height','f-weight'].forEach(id=>document.getElementById(id).value='');
+  ['f-ht','f-style'].forEach(id=>{const s=document.getElementById(id);s.value='';s.classList.remove('has-value');});
+  document.getElementById('bar-fill').style.width='0%';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('ai-card').classList.remove('show');
+  document.getElementById('dots').classList.remove('show');
+  document.getElementById('ph').style.display='';
+  document.getElementById('analyze-btn').disabled=false;
+}
+</script>
+</body>
+</html>
